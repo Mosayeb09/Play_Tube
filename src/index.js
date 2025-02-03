@@ -1,21 +1,18 @@
 // require('dotenv').config({path:"./env"})
 import dotenv from "dotenv";
 import connectDB from "./db/index.js";
-<<<<<<< HEAD
+
 // import express from "express";
 import app from "./app.js";
-=======
->>>>>>> 7d8a2841c084d565675dd678aacbdf4f04ac7b1c
+
 
 dotenv.config(
-    {path:"./env"}
+    {path:"./.env"}
 )
 
-<<<<<<< HEAD
 // const app = express();
 
-=======
->>>>>>> 7d8a2841c084d565675dd678aacbdf4f04ac7b1c
+
 connectDB()
 .then(()=>{
     app.listen(process.env.PORT || 8000,()=>{
