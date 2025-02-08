@@ -148,7 +148,7 @@ const logoutUser = asyncHandler(async(req, res) => {
   await User.findByIdAndUpdate(
     req.user._id,
     {
-      $set:{refreshToken: undefined}
+      $unset:{refreshToken: 1}//this will remove the field
     },
     {
       new:true
@@ -333,6 +333,8 @@ const updateUserCoverImage = asyncHandler(async(req,res)=>{
 
 const getUserChannelProfile = asyncHandler(async(req,res)=>{
   const {username}=req.params
+  // const { ObjectId } = mongoose.Types;
+
 
   if(!username?.trim()){
 
@@ -341,7 +343,7 @@ const getUserChannelProfile = asyncHandler(async(req,res)=>{
   }
 
   const channel = await User.aggregate([
-
+    // const { ObjectId } = mongoose.Types;
     {
       $match:{
         username:username?.toLowerCase()
@@ -373,13 +375,15 @@ const getUserChannelProfile = asyncHandler(async(req,res)=>{
 
           $size:"$subscribedTo"
         },
-        isSubscribedToChannel:{
-          $cond:{
-            if:{
-              $in:[req.user?._id,"subscribers.subscriber"]
+
+
+        isSubscribedToChannel: {
+          $cond: {
+            if: {
+              $in: [mongoose.Types.ObjectId.createFromHexString(req.user?._id.toString()), "$subscribers.subscriber"]
             },
-            then:true,
-            else:false
+            then: true,
+            else: false
           }
         }
       }
@@ -410,9 +414,20 @@ const getWatchHistory = asyncHandler(async(req,res) =>{
   const user = await User.aggregate([
     {
       $match:{
-        _id: mongoose.Types.ObjectId(req.user._id)
+        _id: new mongoose.Types.ObjectId(req.user._id)
       }
     },
+    // {
+    //   $addFields: {
+    //     watchHistory: {
+    //       $cond: {
+    //         if: { $isArray: "$watchHistory" },
+    //         then: "$watchHistory",
+    //         else: [{ $toObjectId: "$watchHistory" }]
+    //       }
+    //     }
+    //   }
+    // },
     {
       $lookup:{
         from:"videos",
